@@ -4,7 +4,9 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import axios from 'axios';
 import Checkbox from '@mui/material/Checkbox';
+import Paper from '@mui/material/Paper';
 import { CircularProgress, Box } from '@mui/material';
+import {Close} from '@mui/icons-material';
 
 interface ICharacter {
   id: string;
@@ -47,11 +49,14 @@ const AutocompleteAsync = () => {
   }, [inputValue]);
 
   const highlightText = (text: string, part: string) => {
-    const parts = text.split(new RegExp(`(${part})`, 'gi'));
+    const parts = text.split(new RegExp(`(${part})`, 'gi')); // g global i büyük küçük harf duyarlılığı
     return parts.map((part, i) =>
       part.toLowerCase() === inputValue.toLowerCase() ? <strong key={i}>{part}</strong> : part
     );
   };
+  const CustomPaper = (props) => (
+    <Paper {...props} style={{border: '1px solid #94A3B8', borderRadius: 5, backgroundColor: 'white', boxShadow: 'none' }} />
+  );
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
@@ -74,6 +79,7 @@ const AutocompleteAsync = () => {
           options={options}
           loading={loading}
           value={selectedOptions}
+          PaperComponent={CustomPaper} 
           onChange={(event, newValue) => {
             setSelectedOptions(newValue);
           }}
@@ -97,6 +103,8 @@ const AutocompleteAsync = () => {
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip
+                style={{ backgroundColor: '#E2E8F0', borderRadius: '4px'}}
+                deleteIcon={<Close fontSize='small'  style={{ color: 'white', backgroundColor: '#95A3B8', borderRadius: '4px' }} />}
                 {...getTagProps({ index })}
                 key={option.id}
                 label={option.name}
@@ -110,12 +118,12 @@ const AutocompleteAsync = () => {
             ))
           }
           renderOption={(props, option, { selected }) => (
-            <li {...props}>
+            <li {...props} style={{borderBottom:"solid 1px #94A3B8", boxShadow:"none"}}>
               <Checkbox
                 style={{ marginRight: 8 }}
                 checked={selected}
               />
-              <img src={option.image} alt={option.name} style={{ marginRight: 10, width: 50, height: 50 }} />
+              <img src={option.image} alt={option.name} style={{ marginRight: 10, width: 50, height: 50 , borderRadius:8}} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span>{highlightText(option.name, inputValue)}</span>
                 <span>Episodes: {option.episode.length}</span>
