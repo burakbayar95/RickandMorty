@@ -85,6 +85,10 @@ const AutocompleteAsync = () => {
           }}
           renderInput={(params) => (
             <TextField
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '16px' // Tüm kenarlar için 16px yuvarlaklık
+              }}}
               {...params}
               label="Search Characters"
               variant="outlined"
