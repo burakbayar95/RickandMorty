@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import Chip from '@mui/material/Chip';
+import React, { useState, useEffect, createContext  } from 'react';
 import axios from 'axios';
-import Checkbox from '@mui/material/Checkbox';
-import Paper from '@mui/material/Paper';
-import { CircularProgress, Box } from '@mui/material';
+import { CircularProgress, Box, Paper, Checkbox, TextField, Chip, Autocomplete,Alert } from '@mui/material';
 import {Close} from '@mui/icons-material';
+import logo from '../image/logo.png';
 
 interface ICharacter {
   id: string;
@@ -21,31 +17,29 @@ const AutocompleteAsync = () => {
   const [loading, setLoading] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<ICharacter[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    let active = true;
-
     if (inputValue === '') {
-      return undefined;
+      setOptions([]);
+      return;
     }
-
+    
     setLoading(true);
+    setError(false);
+    setErrorMessage('');
     axios.get(`https://rickandmortyapi.com/api/character/?name=${inputValue}`)
       .then(response => {
-        if (active) {
-          setOptions(response.data.results);
-          setLoading(false);
-        }
+        setOptions(response.data.results);
+        setLoading(false);
       })
-      .catch(() => {
-        if (active) {
-          setLoading(false);
-        }
+      .catch(err => {
+        setLoading(false);
+        setError(true);
+        setErrorMessage('No Data Found');
+        console.error(err.message);
       });
-
-    return () => {
-      active = false;
-    };
   }, [inputValue]);
 
   const highlightText = (text: string, part: string) => {
@@ -59,7 +53,12 @@ const AutocompleteAsync = () => {
   );
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+    <>
+    <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box mb={2}>
+        <img src={logo} alt="Rick and Morty" style={{ width: 200 }} />
+      </Box>
+   
       <Box width="100%" maxWidth={500} p={3} bgcolor="background.paper" borderRadius={2} boxShadow={3}>
         <Autocomplete
           multiple
@@ -70,6 +69,7 @@ const AutocompleteAsync = () => {
           }}
           onClose={() => {
             setOpen(false);
+            setError(false)
             if (selectedOptions.length == 0) {
               setInputValue('')
             }
@@ -136,7 +136,16 @@ const AutocompleteAsync = () => {
           )}
         />
       </Box>
+      <Box position="absolute" top={0} width="100%">
+          {error && (
+            <Alert severity="error" style={{ margin: 3 }}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Box>
+      
     </Box>
+        </>
   );
 };
 
