@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext  } from 'react';
+import React, { useState, useEffect, useCallback  } from 'react';
 import axios from 'axios';
 import { CircularProgress, Box, Paper, Checkbox, TextField, Chip, Autocomplete,Alert } from '@mui/material';
 import {Close} from '@mui/icons-material';
@@ -42,19 +42,20 @@ const AutocompleteAsync = () => {
       });
   }, [inputValue]);
 
-  const highlightText = (text: string, part: string) => {
+  const highlightText = useCallback((text: string, part: string) => {
     const parts = text.split(new RegExp(`(${part})`, 'gi')); // g global i büyük küçük harf duyarlılığı
     return parts.map((part, i) =>
       part.toLowerCase() === inputValue.toLowerCase() ? <strong key={i}>{part}</strong> : part
     );
-  };
+  },[inputValue]);
+
   const CustomPaper = (props) => (
     <Paper {...props} style={{border: '1px solid #94A3B8', borderRadius: 5, backgroundColor: 'white', boxShadow: 'none' }} />
   );
 
   return (
     <>
-    <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="100vh">
+    <Box display="flex" flexDirection="column" justifyContent="flex-start" marginTop={10} alignItems="center" minHeight="100vh">
       <Box mb={2}>
         <img src={logo} alt="Rick and Morty" style={{ width: 200 }} />
       </Box>
@@ -87,7 +88,7 @@ const AutocompleteAsync = () => {
             <TextField
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: '16px' // Tüm kenarlar için 16px yuvarlaklık
+                borderRadius: '16px'
               }}}
               {...params}
               label="Search Characters"
@@ -114,9 +115,7 @@ const AutocompleteAsync = () => {
                 label={option.name}
                 onDelete={() => {
                   setSelectedOptions(value.filter((entry) => entry.id !== option.id));
-                  if (selectedOptions.length == 0) {
-                    setInputValue('')
-                  }
+                  // setInputValue('');//tercihe göre kullanılabilir.                 
                 }}
               />
             ))
@@ -126,6 +125,10 @@ const AutocompleteAsync = () => {
               <Checkbox
                 style={{ marginRight: 8 }}
                 checked={selected}
+                onClick={() => { 
+                 // setInputValue('')//tercihe göre kullanılabilir. 
+                 }
+                }
               />
               <img src={option.image} alt={option.name} style={{ marginRight: 10, width: 50, height: 50 , borderRadius:8}} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
